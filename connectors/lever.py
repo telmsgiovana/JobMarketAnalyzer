@@ -2,7 +2,7 @@ import requests
 from datetime import datetime, timezone
 import json
 
-EMPRESAS= ["jobgether","farfetch"]
+EMPRESAS= ["jobgether","farfetch","swordhealth","xsolla","veeva","weloglobal","yuno","pipedrive"]
 
 
 
@@ -23,7 +23,7 @@ def montar_descricao(job):
         partes.append(f"{titulo}\n{conteudo}")
     return "\n\n".join(partes)
 
-def parse_lever_job(job, company):
+def parse_lever_job(job, company,collected_at):
     categories = job.get("categories") or {}
 
     return {
@@ -32,7 +32,7 @@ def parse_lever_job(job, company):
         "id": str(job.get("id")),
         "title": job.get("text"),
         "created_at":ms_para_iso(job.get("createdAt")),          # job["createdAt"] vem em ms — converter
-        "collected_at": datetime.now(timezone.utc).isoformat(),        # data de agora
+        "collected_at": collected_at,        # data de agora
         "country": job.get("country"),
         "location_raw": categories.get("location"),
         "location_normalized": None,   # Fase 3
@@ -58,9 +58,15 @@ def buscar_vagas_lever(company):
 
 def coletar_lever(empresas=EMPRESAS):
     todas = []
+    agora=datetime.now(timezone.utc).isoformat()
     for empresa in empresas:
         jobs = buscar_vagas_lever(empresa)
-        todas.extend(parse_lever_job(job, empresa) for job in jobs)
+
+        if not isinstance(jobs, list):
+            print(f"{empresa}: falhou — {jobs}")
+            continue
+
+        todas.extend(parse_lever_job(job, empresa,agora) for job in jobs)
         print(f"{empresa}: {len(jobs)} vagas")
     return todas
 
