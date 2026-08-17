@@ -46,6 +46,17 @@ Conhece Python básico. Não conhece a fundo: git/GitHub, SQL, APIs, scraping, M
 8. **Antes de adicionar dependência nova** (biblioteca, ferramenta), explique por que
    é necessária e se dá para evitar.
 
+## Git — regras obrigatórias
+
+- **Nunca assinar os commits.** Não incluir `Co-Authored-By`, "Generated with Claude",
+  nem qualquer menção ao Claude na mensagem de commit ou no corpo de PRs.
+  Os commits são meus e devem aparecer só com o meu nome.
+
+- **Nunca fazer `git commit`, `git push` ou qualquer operação que altere o histórico
+  sem minha autorização explícita.** Pode sugerir o comando e me dizer quando é hora
+  de commitar — quem executa sou eu, a menos que eu peça diretamente
+  ("faz o commit pra mim").
+
 ## Roadmap
 
 | Sprint | Tema | Estado |

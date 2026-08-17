@@ -2,6 +2,12 @@ import gzip
 import json
 import sqlite3
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+import turso_serverless
+
+load_dotenv()
+
 
 RAIZ = Path(__file__).resolve().parent.parent
 DB_PATH = RAIZ / "data" / "jobs.db"
@@ -13,9 +19,16 @@ COLUNAS = [
     "raw_json", "first_seen", "last_seen",
 ]
 
+# quantas vagas por requisicao ao banco remoto
+# limite do SQLite: 999 valores por comando -> 999 / 21 colunas = 47
+TAMANHO_LOTE = 45
+
 
 def conectar():
-    return sqlite3.connect(DB_PATH)
+    return turso_serverless.connect(
+        os.environ["TURSO_URL"],
+        auth_token=os.environ["TURSO_TOKEN"],
+    )
 
 
 def criar_tabela():
@@ -54,24 +67,35 @@ def criar_tabela():
 
 def salvar_vagas(vagas):
     conn = conectar()
-    nomes=", ".join(COLUNAS)
-    marcadores= ", ".join("?" * len(COLUNAS))
 
-    sql=f"""
-        INSERT INTO vagas ({nomes})
-        VALUES ({marcadores})
-        ON CONFLICT (source, company,id) DO UPDATE SET
-            last_seen=excluded.last_seen
-            """
+    
 
+
+
+    # prepara os valores de todas as vagas, na ordem das colunas
+    todos_valores = []
     for vaga in vagas:
-        dados= dict(vaga)
-        dados["first_seen"]= dados["collected_at"]
+        dados = dict(vaga)
+        dados["first_seen"] = dados["collected_at"]
         dados["last_seen"] = dados["collected_at"]
+        todos_valores.append([dados.get(coluna) for coluna in COLUNAS])
 
-        valores=[dados.get(coluna) for coluna in COLUNAS]
-        conn.execute(sql,valores)
+    nomes = ", ".join(COLUNAS)
+    grupo = "(" + ", ".join("?" * len(COLUNAS)) + ")"
 
+    # grava em lotes: um INSERT com varias linhas por requisicao
+    for i in range(0, len(todos_valores), TAMANHO_LOTE):
+        lote = todos_valores[i:i + TAMANHO_LOTE]
+
+        sql = f"""
+            INSERT INTO vagas ({nomes})
+            VALUES {", ".join([grupo] * len(lote))}
+            ON CONFLICT (source, company, id) DO UPDATE SET
+                last_seen = excluded.last_seen
+        """
+
+        achatados = [valor for linha in lote for valor in linha]
+        conn.execute(sql, achatados)
 
     conn.commit()
     conn.close()
