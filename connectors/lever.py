@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime, timezone
+import gzip
 import json
 
 EMPRESAS= ["jobgether","farfetch","swordhealth","xsolla","veeva","weloglobal","yuno","pipedrive"]
@@ -46,7 +47,7 @@ def parse_lever_job(job, company,collected_at):
         "hosted_url": job.get("hostedUrl"),
         "apply_url":job.get("applyUrl") ,
         "full_description": montar_descricao(job),    # descriptionPlain + lists
-        "raw_json": json.dumps(job),            # JSON original inteiro
+        "raw_json": gzip.compress(json.dumps(job).encode()),   # JSON original comprimido
     }
 
 

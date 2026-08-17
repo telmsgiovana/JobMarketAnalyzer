@@ -1,3 +1,5 @@
+import gzip
+import json
 import sqlite3
 from pathlib import Path
 
@@ -38,7 +40,7 @@ def criar_tabela():
             hosted_url          TEXT,
             apply_url           TEXT,
             full_description    TEXT,
-            raw_json            TEXT,
+            raw_json            BLOB,
             first_seen          TEXT,
             last_seen           TEXT,
             PRIMARY KEY (source, company, id)
@@ -73,6 +75,12 @@ def salvar_vagas(vagas):
 
     conn.commit()
     conn.close()
+
+
+def ler_raw_json(dados):
+    """Descomprime o raw_json guardado no banco e devolve o dicionario original."""
+    return json.loads(gzip.decompress(dados).decode())
+
 
 if __name__ == "__main__":
     criar_tabela()
