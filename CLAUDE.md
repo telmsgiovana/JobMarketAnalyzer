@@ -64,8 +64,8 @@ Conhece Python básico. Não conhece a fundo: git/GitHub, SQL, APIs, scraping, M
 | 1 | Conector Lever (API) | ✅ concluído |
 | 2 | Banco de dados SQLite | ✅ concluído |
 | 3 | Automação com GitHub Actions + banco na nuvem | ✅ concluído |
-| 4 | Conector Greenhouse | 🚧 próximo |
-| 5 | Web scraping (BeautifulSoup) | pendente |
+| 4 | Conector Greenhouse | ✅ concluído |
+| 5 | Web scraping (BeautifulSoup) | 🚧 próximo |
 | 6 | Playwright (sites com JavaScript) | pendente |
 | 7 | Limpeza de dados | pendente |
 | 8 | Dashboard Streamlit + deploy | pendente |
@@ -84,7 +84,10 @@ Marco de empregabilidade: fim do Sprint 8 — dashboard público no CV.
 - **`raw_json`**: guardar o JSON original de cada vaga, para reprocessar sem recoletar.
 - **Campos derivados** (skills, senioridade) não entram no schema do conector —
   vão em tabela separada nas fases de análise.
-- **Limpeza de HTML** fica para o Sprint 7, não nos conectores.
+- **Limpeza de HTML** fica para o Sprint 7, não nos conectores. O conector da Greenhouse
+  só faz `html.unescape()` no `content`, para deixar as duas fontes no mesmo estado.
+- **Campos que uma fonte não tem** ficam `None`. O schema é união das fontes, não interseção.
+  A Greenhouse não fornece `country`, `team`, `commitment` nem `workplace_type`.
 - **`data/*.json` e o banco** não sobem para o git.
 - **Banco na nuvem: Turso** (SQLite hospedado). Escolhido pelo espaço gratuito de 5 GB
   e por manter o mesmo SQL do SQLite local. Migração para Postgres fica como exercício futuro.

@@ -6,21 +6,23 @@ competências, tecnologias e tendências do mercado.
 
 ## O que já funciona
 
-- **Conector Lever** — coleta vagas de várias empresas via API e traduz para um schema único
+- **Conectores Lever e Greenhouse** — coletam vagas de 16 empresas via API e traduzem
+  para um schema único, apesar de as duas APIs terem formatos bem diferentes
 - **Banco na nuvem** — SQLite hospedado (Turso), com inserção idempotente
 - **Histórico de vagas** — campos `first_seen` e `last_seen` permitem saber quando uma vaga
   apareceu, se ainda está aberta e quanto tempo durou
 - **Coleta automática** — GitHub Actions roda a coleta todos os dias, sem intervenção
 
-Hoje o banco acompanha cerca de **7 mil vagas** de 8 empresas.
+Hoje o banco acompanha cerca de **7,5 mil vagas** de 16 empresas, em duas plataformas.
 
 ## Como funciona
 
 ```
-API Lever  ──>  parser  ──>  schema único  ──>  Turso (nuvem)
-                                                    ^
-                                    GitHub Actions ─┘
-                                     (diário, 06:00 UTC)
+API Lever       ──>  parser  ──┐
+                               ├──>  schema único  ──>  Turso (nuvem)
+API Greenhouse  ──>  parser  ──┘                            ^
+                                            GitHub Actions ─┘
+                                             (diário, 06:00 UTC)
 ```
 
 Cada fonte tem seu próprio parser, que traduz o formato da API para o schema definido
@@ -42,8 +44,8 @@ Decisões de projeto relevantes:
 | Aquisição | Conector Lever | ✅ |
 | Armazenamento | Banco SQLite → Turso | ✅ |
 | Automação | GitHub Actions diário | ✅ |
-| Aquisição | Conector Greenhouse | em andamento |
-| Aquisição | Web scraping (BeautifulSoup, Playwright) | |
+| Aquisição | Conector Greenhouse | ✅ |
+| Aquisição | Web scraping (BeautifulSoup, Playwright) | em andamento |
 | Tratamento | Limpeza e padronização | |
 | Visualização | Dashboard Streamlit | |
 | Análise | ML: senioridade e clustering de vagas | |
