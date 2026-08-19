@@ -62,9 +62,9 @@ Conhece Python básico. Não conhece a fundo: git/GitHub, SQL, APIs, scraping, M
 | Sprint | Tema | Estado |
 |--------|------|--------|
 | 1 | Conector Lever (API) | ✅ concluído |
-| 2 | Banco de dados SQLite | 🚧 em andamento |
-| 3 | Automação com GitHub Actions | pendente |
-| 4 | Conector Greenhouse | pendente |
+| 2 | Banco de dados SQLite | ✅ concluído |
+| 3 | Automação com GitHub Actions + banco na nuvem | ✅ concluído |
+| 4 | Conector Greenhouse | 🚧 próximo |
 | 5 | Web scraping (BeautifulSoup) | pendente |
 | 6 | Playwright (sites com JavaScript) | pendente |
 | 7 | Limpeza de dados | pendente |
@@ -86,6 +86,16 @@ Marco de empregabilidade: fim do Sprint 8 — dashboard público no CV.
   vão em tabela separada nas fases de análise.
 - **Limpeza de HTML** fica para o Sprint 7, não nos conectores.
 - **`data/*.json` e o banco** não sobem para o git.
+- **Banco na nuvem: Turso** (SQLite hospedado). Escolhido pelo espaço gratuito de 5 GB
+  e por manter o mesmo SQL do SQLite local. Migração para Postgres fica como exercício futuro.
+- **`raw_json` guardado comprimido** com `gzip` em coluna `BLOB`. Reduziu o banco de
+  145 MB para 65 MB. Ler de volta com `ler_raw_json()`.
+- **Gravação em lote** (`TAMANHO_LOTE = 45`): um `INSERT` com várias linhas por requisição.
+  Pela rede, um `execute` por vaga levava 27 min; em lote, 3 min.
+- **Credenciais**: `.env` local (fora do git) e *secrets* no GitHub Actions.
+  Os nomes das variáveis são iguais nos dois: `TURSO_URL` e `TURSO_TOKEN`.
+- **Coleta automática**: `.github/workflows/coleta.yml`, todo dia às 06:00 UTC,
+  com botão de execução manual (`workflow_dispatch`).
 - Scripts rodam **a partir da raiz do projeto** (`python connectors/lever.py`).
 
 ## Convenções
