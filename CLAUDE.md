@@ -65,16 +65,20 @@ Conhece Python básico. Não conhece a fundo: git/GitHub, SQL, APIs, scraping, M
 | 2 | Banco de dados SQLite | ✅ concluído |
 | 3 | Automação com GitHub Actions + banco na nuvem | ✅ concluído |
 | 4 | Conector Greenhouse | ✅ concluído |
-| 5 | Web scraping (BeautifulSoup) | 🚧 próximo |
-| 6 | Playwright (sites com JavaScript) | pendente |
-| 7 | Limpeza de dados | pendente |
-| 8 | Dashboard Streamlit + deploy | pendente |
-| 9 | ML (classificador de senioridade, clustering) | pendente |
-| 10 | Extração de skills com LLM | pendente |
-| 11 | Agente analista (tool use + SQL) | pendente |
-| 12 | Extras (série temporal, agente mentor, busca semântica) | pendente |
+| 5 | Conector SmartRecruiters (paginação + detalhe por vaga) | ✅ concluído |
+| 6 | Web scraping (BeautifulSoup) | 🚧 próximo |
+| 7 | Playwright (sites com JavaScript) | pendente |
+| 8 | Limpeza de dados | pendente |
+| 9 | Dashboard Streamlit + deploy | pendente |
+| 10 | ML (classificador de senioridade, clustering) | pendente |
+| 11 | Extração de skills com LLM | pendente |
+| 12 | Agente analista (tool use + SQL) | pendente |
+| 13 | Extras (série temporal, agente mentor, busca semântica) | pendente |
 
-Marco de empregabilidade: fim do Sprint 8 — dashboard público no CV.
+Marco de empregabilidade: fim do Sprint 9 — dashboard público no CV.
+
+Motivo do SmartRecruiters: empresas grandes em Portugal (ex: Natixis) usam essa plataforma.
+Cobertura local importa mais que volume, porque o objetivo é emprego lá.
 
 ## Decisões técnicas já tomadas
 
@@ -84,7 +88,7 @@ Marco de empregabilidade: fim do Sprint 8 — dashboard público no CV.
 - **`raw_json`**: guardar o JSON original de cada vaga, para reprocessar sem recoletar.
 - **Campos derivados** (skills, senioridade) não entram no schema do conector —
   vão em tabela separada nas fases de análise.
-- **Limpeza de HTML** fica para o Sprint 7, não nos conectores. O conector da Greenhouse
+- **Limpeza de HTML** fica para o Sprint 8, não nos conectores. O conector da Greenhouse
   só faz `html.unescape()` no `content`, para deixar as duas fontes no mesmo estado.
 - **Campos que uma fonte não tem** ficam `None`. O schema é união das fontes, não interseção.
   A Greenhouse não fornece `country`, `team`, `commitment` nem `workplace_type`.
@@ -99,6 +103,13 @@ Marco de empregabilidade: fim do Sprint 8 — dashboard público no CV.
   Os nomes das variáveis são iguais nos dois: `TURSO_URL` e `TURSO_TOKEN`.
 - **Coleta automática**: `.github/workflows/coleta.yml`, todo dia às 06:00 UTC,
   com botão de execução manual (`workflow_dispatch`).
+- **SmartRecruiters**: a listagem é paginada (`offset`/`limit`, teto de 100) e a descrição
+  só existe no detalhe de cada vaga (padrão N+1). O filtro por país roda **antes** do loop
+  de detalhes — corta ~88% das requisições.
+- **Filtro por país no SmartRecruiters** (`PAISES = ["pt", "br"]`): a exceção à regra de
+  coletar tudo. O motivo é custo de rede, não relevância, e o campo é estrutural.
+- **Seções da descrição** (`SECOES`): só `jobDescription` e `qualifications`.
+  `companyDescription` e `additionalInformation` são boilerplate.
 - Scripts rodam **a partir da raiz do projeto** (`python connectors/lever.py`).
 
 ## Convenções
