@@ -31,19 +31,29 @@ def baixar(url):
 
 
 def mostrar_tags(sopa, tags):
-    """Lista os elementos de cada tag, com suas classes e o texto de dentro."""
+    """Agrupa os elementos de cada tag por classe e conta.
+
+    Numa pagina com 150 links, listar os primeiros so mostra menu e rodape.
+    Agrupando por classe, a que se repete muitas vezes costuma ser a dos dados.
+    """
     for tag in tags:
         elementos = sopa.find_all(tag)
         print(f"=== <{tag}> — {len(elementos)} na pagina ===")
 
-        for el in elementos[:LIMITE]:
-            classe = " ".join(el.get("class") or [])
-            texto = " ".join(el.text.split())          # junta espacos e quebras de linha
-            print(f"  class='{classe[:45]}'")
-            print(f"     {texto[:75]}")
+        grupos = {}
+        for el in elementos:
+            classe = " ".join(el.get("class") or []) or "(sem classe)"
+            grupos.setdefault(classe, []).append(el)
 
-        if len(elementos) > LIMITE:
-            print(f"  ... mais {len(elementos) - LIMITE}")
+        # as classes mais repetidas primeiro: e onde costumam estar os dados
+        for classe, iguais in sorted(grupos.items(), key=lambda x: -len(x[1]))[:LIMITE]:
+            exemplos = [" ".join(e.text.split())[:45] for e in iguais[:2] if e.text.strip()]
+            print(f"  {len(iguais):4}x  class='{classe[:50]}'")
+            for ex in exemplos:
+                print(f"          {ex}")
+
+        if len(grupos) > LIMITE:
+            print(f"  ... mais {len(grupos) - LIMITE} classes diferentes")
         print()
 
 
