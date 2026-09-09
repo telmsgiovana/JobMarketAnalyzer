@@ -1,13 +1,17 @@
 from connectors.lever import coletar_lever
 from connectors.greenhouse import coletar_greenhouse
 from connectors.smartrecruiter import coletar_smartrecruiters
+from connectors.primeit import coletar_primeit
+from scrapers.ltplabs import coletar_ltplabs
 from database.db import criar_tabela, salvar_vagas
 
 
 def main():
     criar_tabela()
 
-    vagas = coletar_lever() + coletar_greenhouse() + coletar_smartrecruiters()
+    vagas = (coletar_lever() + coletar_greenhouse()
+             + coletar_smartrecruiters() + coletar_primeit()
+             + coletar_ltplabs())
     salvar_vagas(vagas)
 
     print(f"\n{len(vagas)} vagas salvas no banco")
