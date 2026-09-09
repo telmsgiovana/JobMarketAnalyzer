@@ -1,6 +1,10 @@
 __pycache__/
 .venv/
 *.pyc
-data/*.json
 .env
-data/*.db
+
+# dados gerados pela coleta
+data/
+
+# saidas de ferramentas
+.playwright-mcp/

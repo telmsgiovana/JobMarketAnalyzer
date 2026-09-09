@@ -112,6 +112,48 @@ Cobertura local importa mais que volume, porque o objetivo é emprego lá.
   `companyDescription` e `additionalInformation` são boilerplate.
 - Scripts rodam **a partir da raiz do projeto** (`python connectors/lever.py`).
 
+## Alvos de scraping — diagnóstico já feito
+
+Fluxo de decisão usado em cada site: (1) o HTML tem as vagas? → BeautifulSoup.
+(2) Existe requisição escondida com JSON? (DevTools → Network → Fetch/XHR → Ctrl+F
+com um título de vaga) → `requests` direto. (3) Só aparece com JavaScript → Playwright.
+Antes de qualquer coisa, conferir o `robots.txt`.
+
+| Site | Diagnóstico | Situação |
+|------|-------------|----------|
+| LTPlabs | estático, 15 vagas, todas de dados/IA | **Sprint 6 — primeiro alvo** |
+| Deloitte (`jobs.deloitte.pt/search/`) | estático, SuccessFactors, paginação `?startrow=` | Sprint 6 — segundo |
+| Landing.jobs | estático, portal com muitas vagas, tem sitemap | Sprint 6 — terceiro |
+| ITJobs | estático, portal; `Crawl-delay: 1` | Sprint 6 — quarto |
+| PrimeIT | resolvido via API do key.work | conector escrito |
+| KPMG | Workday | investigar — um conector Workday serve dezenas de empresas |
+| Microsoft | Eightfold (aplicação JavaScript) | testado: nenhum endereço serve HTML com vagas. DevTools ou Playwright |
+| Revolut | parcial: 6 destaques no HTML, resto por JavaScript | testar API escondida antes de Playwright |
+| NTT Data | Salesforce Aura, 100% JavaScript | Sprint 7 (Playwright) |
+| Critical Software, Caixa Mágica, Capgemini, ICT Strypes | não identificado | testar DevTools |
+| The Data Scientists | estático e permitido, mas **sem vagas abertas** | quando publicarem |
+
+Notas de robots.txt:
+- **ITJobs**: `Content-Signal: ai-train=no` — reserva de direitos sob a diretiva europeia
+  de copyright. Coletar e analisar é permitido; treinar modelo com o conteúdo, não.
+  Também bloqueia `ClaudeBot`, então o Claude não deve fazer requisições ao site —
+  o scraper dela, sim.
+- **Landing.jobs**: bloqueia `/api/` e `/jobs/search`; as páginas de vaga são permitidas.
+- **Deloitte**: bloqueia só áreas de candidatura; `/search/` é permitido.
+- **The Data Scientists**: `Crawl-delay: 10`.
+
+## Próximos passos do Sprint 6
+
+1. `pip install beautifulsoup4` e atualizar o `requirements.txt`
+2. Aprender o básico do BeautifulSoup na página da LTPlabs
+3. Escrever `scrapers/ltplabs.py`: listar as vagas, buscar o detalhe de cada uma,
+   traduzir para o schema
+4. Plugar no `main.py` e commitar
+5. Repetir para Deloitte (com paginação) e depois para os portais
+
+Pendências antes disso: commitar a `continental` no SmartRecruiters e o
+`connectors/primeit.py`.
+
 ## Convenções
 
 - Commits: `feat:`, `fix:`, `docs:`, `chore:`
