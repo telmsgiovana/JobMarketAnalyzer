@@ -8,17 +8,37 @@ from scrapers.landingjobs import coletar_landingjobs
 from scrapers.itjobs import coletar_itjobs
 from database.db import criar_tabela, salvar_vagas
 
+# cada fonte e independente: se uma falhar, as outras continuam
+FONTES = [
+    ("lever", coletar_lever),
+    ("greenhouse", coletar_greenhouse),
+    ("smartrecruiters", coletar_smartrecruiters),
+    ("primeit", coletar_primeit),
+    ("ltplabs", coletar_ltplabs),
+    ("deloitte", coletar_deloitte),
+    ("landingjobs", coletar_landingjobs),
+    ("itjobs", coletar_itjobs),
+]
+
 
 def main():
     criar_tabela()
 
-    vagas = (coletar_lever() + coletar_greenhouse()
-             + coletar_smartrecruiters() + coletar_primeit()
-             + coletar_ltplabs() + coletar_deloitte()
-             + coletar_landingjobs() + coletar_itjobs())
+    vagas = []
+    falhas = []
+
+    for nome, coletar in FONTES:
+        try:
+            vagas.extend(coletar())
+        except Exception as erro:
+            falhas.append(nome)
+            print(f"{nome}: FALHOU — {type(erro).__name__}: {erro}")
+
     salvar_vagas(vagas)
 
     print(f"\n{len(vagas)} vagas salvas no banco")
+    if falhas:
+        print(f"fontes com falha: {', '.join(falhas)}")
 
 
 if __name__ == "__main__":

@@ -1,61 +1,6 @@
-# Instruções do projeto
+# Decisões técnicas
 
-## Sobre o projeto
-
-**Job Market Analyzer** — plataforma de análise do mercado de trabalho em Dados e IA.
-Coleta vagas de APIs e web scrapers, padroniza num schema único, armazena em banco,
-e gera análises com ML e LLMs.
-
-Objetivo duplo: **aprender** (APIs, scraping, automação, ML, agentes) e **construir
-portfólio** para conseguir emprego na área.
-
-## Sobre quem está desenvolvendo
-
-Estudante de IA e Ciência de Dados, último ano. Está aprendendo enquanto constrói.
-Conhece Python básico. Não conhece a fundo: git/GitHub, SQL, APIs, scraping, ML aplicado.
-
-## Como se comunicar comigo
-
-**Seja didático. Explique o porquê antes do como.**
-
-1. **Um assunto por vez.** Não misture temas. Se estamos na Lever, não fale de
-   Greenhouse. Se estamos no parser, não fale do banco.
-
-2. **Não antecipe sprints futuros.** Cada coisa no seu sprint. Se algo pode esperar,
-   diga que espera e siga.
-
-3. **Explique antes de mostrar código.** O que a coisa faz, por que ela é necessária,
-   e só então o código.
-
-4. **Não dê tudo mastigado.** Prefira:
-   - esqueleto com partes para eu completar
-   - dica de qual função/conceito usar
-   - deixar eu errar e depois revisar
-
-   Dou o código pronto só quando eu pedir explicitamente ou quando estou travada
-   há várias mensagens.
-
-5. **Explique termos técnicos na primeira vez.** Não assuma que conheço.
-   (`.get()`, `extend`, f-string, timestamp, staging, etc.)
-
-6. **Ritmo devagar.** Um passo, eu executo, eu confirmo, próximo passo.
-   Não liste 8 passos de uma vez.
-
-7. **Quando eu apontar um erro seu**, corrija de forma direta e siga. Sem se estender.
-
-8. **Antes de adicionar dependência nova** (biblioteca, ferramenta), explique por que
-   é necessária e se dá para evitar.
-
-## Git — regras obrigatórias
-
-- **Nunca assinar os commits.** Não incluir `Co-Authored-By`, "Generated with Claude",
-  nem qualquer menção ao Claude na mensagem de commit ou no corpo de PRs.
-  Os commits são meus e devem aparecer só com o meu nome.
-
-- **Nunca fazer `git commit`, `git push` ou qualquer operação que altere o histórico
-  sem minha autorização explícita.** Pode sugerir o comando e me dizer quando é hora
-  de commitar — quem executa sou eu, a menos que eu peça diretamente
-  ("faz o commit pra mim").
+Registro das escolhas de arquitetura do projeto e do porquê de cada uma.
 
 ## Roadmap
 
@@ -141,18 +86,6 @@ Notas de robots.txt:
 - **Landing.jobs**: bloqueia `/api/` e `/jobs/search`; as páginas de vaga são permitidas.
 - **Deloitte**: bloqueia só áreas de candidatura; `/search/` é permitido.
 - **The Data Scientists**: `Crawl-delay: 10`.
-
-## Próximos passos do Sprint 6
-
-1. `pip install beautifulsoup4` e atualizar o `requirements.txt`
-2. Aprender o básico do BeautifulSoup na página da LTPlabs
-3. Escrever `scrapers/ltplabs.py`: listar as vagas, buscar o detalhe de cada uma,
-   traduzir para o schema
-4. Plugar no `main.py` e commitar
-5. Repetir para Deloitte (com paginação) e depois para os portais
-
-Pendências antes disso: commitar a `continental` no SmartRecruiters e o
-`connectors/primeit.py`.
 
 ## Convenções
 

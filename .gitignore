@@ -8,3 +8,6 @@ data/
 
 # saidas de ferramentas
 .playwright-mcp/
+
+# instrucoes pessoais de trabalho, nao publicas
+CLAUDE.md
