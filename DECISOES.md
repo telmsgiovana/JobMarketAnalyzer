@@ -11,8 +11,8 @@ Registro das escolhas de arquitetura do projeto e do porquê de cada uma.
 | 3 | Automação com GitHub Actions + banco na nuvem | ✅ concluído |
 | 4 | Conector Greenhouse | ✅ concluído |
 | 5 | Conector SmartRecruiters (paginação + detalhe por vaga) | ✅ concluído |
-| 6 | Web scraping (BeautifulSoup) | 🚧 próximo |
-| 7 | Playwright (sites com JavaScript) | pendente |
+| 6 | Web scraping (BeautifulSoup) | ✅ concluído |
+| 7 | Playwright (sites com JavaScript) | 🚧 próximo |
 | 8 | Limpeza de dados | pendente |
 | 9 | Dashboard Streamlit + deploy | pendente |
 | 10 | ML (classificador de senioridade, clustering) | pendente |
@@ -55,6 +55,24 @@ Cobertura local importa mais que volume, porque o objetivo é emprego lá.
   coletar tudo. O motivo é custo de rede, não relevância, e o campo é estrutural.
 - **Seções da descrição** (`SECOES`): só `jobDescription` e `qualifications`.
   `companyDescription` e `additionalInformation` são boilerplate.
+- **Scrapers em `scrapers/`, conectores em `connectors/`.** A separação é só de origem:
+  os dois devolvem o mesmo schema, e nada depois deles sabe a diferença.
+- **`main.py` isola cada fonte** num `try`. Com oito fontes — quatro delas scrapers, que
+  quebram quando o site muda o design — uma falha não pode derrubar a coleta inteira.
+  A execução termina verde mesmo com falhas; o erro aparece no log e no resumo final.
+- **`explorar.py`**: ferramenta de diagnóstico. Agrupa os elementos de uma tag por classe
+  e ordena por frequência — a classe que se repete muitas vezes costuma ser a dos dados.
+- **Ao raspar, procurar o contêiner da vaga inteira**, não o elemento do título. Na Deloitte
+  isso resolveu a duplicação (2 links por vaga) e deu acesso a local e data nas células
+  vizinhas; na LTPlabs separou vagas de títulos de seção.
+- **`ld+json`**: alguns sites publicam os dados em `<script type="application/ld+json">`
+  (padrão schema.org). Vale conferir antes de raspar tags. Na LTPlabs existe, mas raspamos
+  as tags de propósito, para exercitar a técnica.
+- **Respeitar o `robots.txt`**, incluindo `Crawl-delay` (o ITJobs pede 1 segundo) e as
+  reservas de uso. Quando o site autoriza a listagem mas bloqueia a busca paginada
+  (Landing.jobs), coletamos só o que é permitido.
+- **Vaga publicada em duas fontes entra duas vezes**, porque `source` faz parte da chave.
+  É proposital: permite comparar fontes. Deduplicar entre fontes é assunto do Sprint 8.
 - Scripts rodam **a partir da raiz do projeto** (`python connectors/lever.py`).
 
 ## Alvos de scraping — diagnóstico já feito
@@ -66,11 +84,11 @@ Antes de qualquer coisa, conferir o `robots.txt`.
 
 | Site | Diagnóstico | Situação |
 |------|-------------|----------|
-| LTPlabs | estático, 15 vagas, todas de dados/IA | **Sprint 6 — primeiro alvo** |
-| Deloitte (`jobs.deloitte.pt/search/`) | estático, SuccessFactors, paginação `?startrow=` | Sprint 6 — segundo |
-| Landing.jobs | estático, portal com muitas vagas, tem sitemap | Sprint 6 — terceiro |
-| ITJobs | estático, portal; `Crawl-delay: 1` | Sprint 6 — quarto |
-| PrimeIT | resolvido via API do key.work | conector escrito |
+| LTPlabs | estático, 15 vagas, todas de dados/IA | ✅ `scrapers/ltplabs.py` |
+| Deloitte (`jobs.deloitte.pt/search/`) | estático, SuccessFactors, paginação `?startrow=` | ✅ `scrapers/deloitte.py` — 76 vagas |
+| Landing.jobs | estático; 54 vagas, mas a 2ª página é montada por JavaScript | ✅ `scrapers/landingjobs.py` — 50 vagas, com skills |
+| ITJobs | estático, portal; `Crawl-delay: 1` | ✅ `scrapers/itjobs.py` — 320 vagas, 61 empresas |
+| PrimeIT | site é vitrine do key.work; API própria com `tenant-descriptor` | ✅ `connectors/primeit.py` |
 | KPMG | Workday | investigar — um conector Workday serve dezenas de empresas |
 | Microsoft | Eightfold (aplicação JavaScript) | testado: nenhum endereço serve HTML com vagas. DevTools ou Playwright |
 | Revolut | parcial: 6 destaques no HTML, resto por JavaScript | testar API escondida antes de Playwright |

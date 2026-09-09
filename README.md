@@ -6,52 +6,63 @@ competências, tecnologias e tendências do mercado.
 
 ## O que já funciona
 
-- **Conectores Lever, Greenhouse e SmartRecruiters** — coletam vagas de 21 empresas via API
-  e traduzem para um schema único, apesar de as três APIs terem formatos bem diferentes
-  (uma delas exige paginação e uma requisição por vaga)
+- **Oito fontes de dados** — quatro APIs (Lever, Greenhouse, SmartRecruiters, PrimeIT) e
+  quatro scrapers (ITJobs, Deloitte, Landing.jobs, LTPlabs), todas traduzidas para um
+  schema único apesar de formatos completamente diferentes
 - **Banco na nuvem** — SQLite hospedado (Turso), com inserção idempotente
-- **Histórico de vagas** — campos `first_seen` e `last_seen` permitem saber quando uma vaga
-  apareceu, se ainda está aberta e quanto tempo durou
-- **Coleta automática** — GitHub Actions roda a coleta todos os dias, sem intervenção
+- **Histórico de vagas** — os campos `first_seen` e `last_seen` permitem saber quando uma
+  vaga apareceu, se ainda está aberta e quanto tempo durou
+- **Coleta automática** — GitHub Actions roda todos os dias, sem intervenção
 
-Hoje o banco acompanha cerca de **12,8 mil vagas** de 21 empresas, em três plataformas —
-das quais **1,3 mil em Portugal**.
+Cerca de **22 mil vagas** acompanhadas, das quais **1,6 mil em Portugal**.
 
 ## Como funciona
 
 ```
-API Lever           ──>  parser  ──┐
-API Greenhouse      ──>  parser  ──┼──>  schema único  ──>  Turso (nuvem)
-API SmartRecruiters ──>  parser  ──┘                            ^
-                                                GitHub Actions ─┘
-                                                 (diário, 06:00 UTC)
+APIs         Lever · Greenhouse · SmartRecruiters · PrimeIT   ──┐
+                                                                ├──> schema único ──> Turso
+Scrapers     ITJobs · Deloitte · Landing.jobs · LTPlabs       ──┘         ^
+                                                       GitHub Actions ────┘
+                                                        (diário, 06:00 UTC)
 ```
 
-Cada fonte tem seu próprio parser, que traduz o formato da API para o schema definido
-em [SCHEMA.md](SCHEMA.md). O resto do projeto trabalha só com esse formato, o que permite
-adicionar novas fontes sem alterar o banco nem as análises.
+Cada fonte tem seu próprio tradutor para o schema definido em [SCHEMA.md](SCHEMA.md). O
+resto do projeto trabalha só com esse formato — o banco não sabe se uma vaga veio de uma
+API ou de uma página raspada. Foi isso que permitiu passar de uma para oito fontes sem
+alterar o armazenamento nem a automação.
 
-Decisões de projeto relevantes:
+As decisões de arquitetura e o porquê de cada uma estão em [DECISOES.md](DECISOES.md).
+Algumas das principais:
 
 - **Chave única** `source + company + id`, com *upsert*: recoletar não duplica, só atualiza
 - **JSON original preservado** de cada vaga (comprimido com gzip), permitindo reprocessar
-  os dados sem precisar recoletar
-- **Escrita em lote** para o banco remoto — reduziu a coleta completa de 27 para 3 minutos
-- **Filtro antes da requisição cara** — o SmartRecruiters exige uma chamada por vaga, então
-  as vagas são filtradas por país antes dessa etapa: 88% menos requisições
-- **Credenciais fora do código**, em `.env` local e *secrets* no GitHub Actions
+  sem recoletar
+- **Escrita em lote** no banco remoto — reduziu a coleta de 27 para 3 minutos
+- **Filtro antes da requisição cara** — quando uma API exige uma chamada por vaga, as vagas
+  são filtradas por país antes dessa etapa: 88% menos requisições
+- **Falha isolada por fonte** — um scraper quebrado não derruba a coleta das outras sete
+- **`robots.txt` respeitado**, incluindo `Crawl-delay` e restrições de uso declaradas
+
+## Sobre o scraping
+
+Antes de escrever cada scraper, o site passa por um diagnóstico: o HTML já traz as vagas?
+Existe um bloco `ld+json`? Há uma requisição escondida devolvendo JSON? Só depende de
+JavaScript? Cada resposta leva a uma ferramenta diferente — e evita escrever código que
+não funcionaria.
+
+O diagnóstico de doze sites está registrado em [DECISOES.md](DECISOES.md), com a
+ferramenta usada (`scrapers/explorar.py`) e as restrições de `robots.txt` de cada um.
 
 ## Roadmap
 
 | Fase | Etapa | Estado |
 |------|-------|--------|
-| Aquisição | Conector Lever | ✅ |
+| Aquisição | Conectores de API (4 plataformas) | ✅ |
 | Armazenamento | Banco SQLite → Turso | ✅ |
 | Automação | GitHub Actions diário | ✅ |
-| Aquisição | Conector Greenhouse | ✅ |
-| Aquisição | Conector SmartRecruiters | ✅ |
-| Aquisição | Web scraping (BeautifulSoup, Playwright) | em andamento |
-| Tratamento | Limpeza e padronização | |
+| Aquisição | Web scraping com BeautifulSoup (4 sites) | ✅ |
+| Aquisição | Playwright para sites com JavaScript | em andamento |
+| Tratamento | Limpeza e normalização | |
 | Visualização | Dashboard Streamlit | |
 | Análise | ML: senioridade e clustering de vagas | |
 | Análise | Extração de competências com LLM | |
@@ -59,7 +70,7 @@ Decisões de projeto relevantes:
 
 ## Tecnologias
 
-Python · Requests · SQLite · Turso · GitHub Actions
+Python · Requests · BeautifulSoup · SQLite · Turso · GitHub Actions
 
 ## Como rodar
 
