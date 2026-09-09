@@ -7,7 +7,7 @@ import requests
 
 LIMITE_PAGINA = 100
 
-EMPRESAS = ["Inetum2", "natixisinportugal", "boschgroup", "devoteam", "ceiia"]
+EMPRESAS = ["Inetum2", "natixisinportugal", "boschgroup", "devoteam", "ceiia","continental"]
 PAISES = ["pt", "br"]
 
 # so as secoes que descrevem a vaga; companyDescription e additionalInformation
