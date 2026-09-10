@@ -89,6 +89,17 @@ Cobertura local importa mais que volume, porque o objetivo é emprego lá.
 - **Quando a classe não distingue campos, usar o rótulo.** Na NTT Data a mesma classe
   serve para "Especialização" e "Modalidade de trabalho"; o scraper separa pelo texto
   antes dos dois-pontos.
+- **Playwright é o último recurso, e a vistoria confirma.** Dos quatro sites analisados
+  em bloco (Revolut, Microsoft, Critical Software, Caixa Mágica), só **um** precisava
+  mesmo dele: dois tinham API por trás e um está bloqueado. Partir direto para o
+  navegador teria custado trabalho e dado resultado pior.
+- **Seguir o link externo revela a plataforma.** O site da Critical Software só tinha um
+  botão "See Open Positions" apontando para `critical-software.breezy.hr` — e o Breezy
+  expõe `{empresa}.breezy.hr/json`. Mesmo caminho que levou do PrimeIT ao key.work.
+- **API pública também tem limite.** A da Microsoft devolve 429 depois de poucas chamadas
+  seguidas; o conector espera e tenta de novo, aumentando a espera a cada tentativa.
+- **Proteção anti-bot é um não.** O Revolut usa Cloudflare, que barra até navegador
+  automatizado. Contornar seria ignorar uma recusa explícita do site.
 - Scripts rodam **a partir da raiz do projeto** (`python connectors/lever.py`).
 
 ## Alvos de scraping — diagnóstico já feito
@@ -106,10 +117,12 @@ Antes de qualquer coisa, conferir o `robots.txt`.
 | ITJobs | estático, portal; `Crawl-delay: 1` | ✅ `scrapers/itjobs.py` — 320 vagas, 61 empresas |
 | PrimeIT | site é vitrine do key.work; API própria com `tenant-descriptor` | ✅ `connectors/primeit.py` |
 | KPMG | Workday | investigar — um conector Workday serve dezenas de empresas |
-| Microsoft | Eightfold (aplicação JavaScript) | testado: nenhum endereço serve HTML com vagas. DevTools ou Playwright |
-| Revolut | parcial: 6 destaques no HTML, resto por JavaScript | testar API escondida antes de Playwright |
+| Microsoft | site em JavaScript, mas com **API REST** por trás (`/api/pcsx/search`) | ✅ `connectors/microsoft.py` — 5 vagas em PT; rate limit agressivo |
 | NTT Data | Salesforce Aura, 100% JavaScript; 3 vagas por página, URL não muda | ✅ `scrapers/nttdata.py` — 54 vagas, com tecnologias |
-| Critical Software, Caixa Mágica, Capgemini, ICT Strypes | não identificado | testar DevTools |
+| Critical Software | usa **Breezy HR**; `{empresa}.breezy.hr/json` devolve tudo | ✅ `connectors/breezy.py` |
+| Caixa Mágica | vagas só aparecem depois de rolar a página, por JavaScript | ✅ `scrapers/caixamagica.py` — 27 vagas |
+| Revolut | 436 vagas, mas protegido por Cloudflare — nem o Playwright passa | ❌ inviável |
+| Capgemini, ICT Strypes | não identificado | testar DevTools |
 | The Data Scientists | estático e permitido, mas **sem vagas abertas** | quando publicarem |
 
 Notas de robots.txt:

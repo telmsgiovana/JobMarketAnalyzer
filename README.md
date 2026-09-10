@@ -6,10 +6,10 @@ competências, tecnologias e tendências do mercado.
 
 ## O que já funciona
 
-- **Oito fontes de dados** — quatro APIs (Lever, Greenhouse, SmartRecruiters, PrimeIT),
-  três scrapers de HTML (ITJobs, Deloitte, LTPlabs) e um com navegador automatizado
-  (NTT Data), todas traduzidas para um schema único apesar de formatos completamente
-  diferentes
+- **Onze fontes de dados** — seis APIs (Lever, Greenhouse, SmartRecruiters, PrimeIT,
+  Breezy, Microsoft), três scrapers de HTML (ITJobs, Deloitte, LTPlabs) e dois com
+  navegador automatizado (NTT Data, Caixa Mágica), todas traduzidas para um schema
+  único apesar de formatos completamente diferentes
 - **Banco na nuvem** — SQLite hospedado (Turso), com inserção idempotente
 - **Histórico de vagas** — os campos `first_seen` e `last_seen` permitem saber quando uma
   vaga apareceu, se ainda está aberta e quanto tempo durou
@@ -20,11 +20,13 @@ Cerca de **22 mil vagas** acompanhadas, das quais **1,6 mil em Portugal**.
 ## Como funciona
 
 ```
-APIs         Lever · Greenhouse · SmartRecruiters · PrimeIT   ──┐
-                                                                ├──> schema único ──> Turso
-Scrapers     ITJobs · Deloitte · LTPlabs · NTT Data (Playwright) ─┘        ^
-                                                       GitHub Actions ────┘
-                                                        (diário, 06:00 UTC)
+APIs         Lever · Greenhouse · SmartRecruiters              ──┐
+             PrimeIT · Breezy · Microsoft                        │
+                                                                 ├─> schema único ─> Turso
+Scrapers     ITJobs · Deloitte · LTPlabs                         │        ^
+Playwright   NTT Data · Caixa Mágica                           ──┘        │
+                                                        GitHub Actions ───┘
+                                                         (diário, 06:00 UTC)
 ```
 
 Cada fonte tem seu próprio tradutor para o schema definido em [SCHEMA.md](SCHEMA.md). O
@@ -63,7 +65,7 @@ ferramenta usada (`scrapers/explorar.py`) e as restrições de `robots.txt` de c
 | Armazenamento | Banco SQLite → Turso | ✅ |
 | Automação | GitHub Actions diário | ✅ |
 | Aquisição | Web scraping com BeautifulSoup (3 sites) | ✅ |
-| Aquisição | Playwright para sites com JavaScript | em andamento (NTT Data ✅) |
+| Aquisição | Playwright para sites com JavaScript | ✅ |
 | Tratamento | Limpeza e normalização | |
 | Visualização | Dashboard Streamlit | |
 | Análise | ML: senioridade e clustering de vagas | |
