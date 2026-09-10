@@ -6,9 +6,10 @@ competências, tecnologias e tendências do mercado.
 
 ## O que já funciona
 
-- **Sete fontes de dados** — quatro APIs (Lever, Greenhouse, SmartRecruiters, PrimeIT) e
-  três scrapers (ITJobs, Deloitte, LTPlabs), todas traduzidas para um schema único
-  apesar de formatos completamente diferentes
+- **Oito fontes de dados** — quatro APIs (Lever, Greenhouse, SmartRecruiters, PrimeIT),
+  três scrapers de HTML (ITJobs, Deloitte, LTPlabs) e um com navegador automatizado
+  (NTT Data), todas traduzidas para um schema único apesar de formatos completamente
+  diferentes
 - **Banco na nuvem** — SQLite hospedado (Turso), com inserção idempotente
 - **Histórico de vagas** — os campos `first_seen` e `last_seen` permitem saber quando uma
   vaga apareceu, se ainda está aberta e quanto tempo durou
@@ -21,7 +22,7 @@ Cerca de **22 mil vagas** acompanhadas, das quais **1,6 mil em Portugal**.
 ```
 APIs         Lever · Greenhouse · SmartRecruiters · PrimeIT   ──┐
                                                                 ├──> schema único ──> Turso
-Scrapers     ITJobs · Deloitte · LTPlabs                      ──┘         ^
+Scrapers     ITJobs · Deloitte · LTPlabs · NTT Data (Playwright) ─┘        ^
                                                        GitHub Actions ────┘
                                                         (diário, 06:00 UTC)
 ```
@@ -62,7 +63,7 @@ ferramenta usada (`scrapers/explorar.py`) e as restrições de `robots.txt` de c
 | Armazenamento | Banco SQLite → Turso | ✅ |
 | Automação | GitHub Actions diário | ✅ |
 | Aquisição | Web scraping com BeautifulSoup (3 sites) | ✅ |
-| Aquisição | Playwright para sites com JavaScript | em andamento |
+| Aquisição | Playwright para sites com JavaScript | em andamento (NTT Data ✅) |
 | Tratamento | Limpeza e normalização | |
 | Visualização | Dashboard Streamlit | |
 | Análise | ML: senioridade e clustering de vagas | |
@@ -71,7 +72,7 @@ ferramenta usada (`scrapers/explorar.py`) e as restrições de `robots.txt` de c
 
 ## Tecnologias
 
-Python · Requests · BeautifulSoup · SQLite · Turso · GitHub Actions
+Python · Requests · BeautifulSoup · Playwright · SQLite · Turso · GitHub Actions
 
 ## Como rodar
 

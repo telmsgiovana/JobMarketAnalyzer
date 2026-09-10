@@ -12,7 +12,7 @@ Registro das escolhas de arquitetura do projeto e do porquê de cada uma.
 | 4 | Conector Greenhouse | ✅ concluído |
 | 5 | Conector SmartRecruiters (paginação + detalhe por vaga) | ✅ concluído |
 | 6 | Web scraping (BeautifulSoup) | ✅ concluído |
-| 7 | Playwright (sites com JavaScript) | 🚧 próximo |
+| 7 | Playwright (sites com JavaScript) | 🚧 em andamento |
 | 8 | Limpeza de dados | pendente |
 | 9 | Dashboard Streamlit + deploy | pendente |
 | 10 | ML (classificador de senioridade, clustering) | pendente |
@@ -78,6 +78,17 @@ Cobertura local importa mais que volume, porque o objetivo é emprego lá.
   responde diferente conforme a origem do pedido. Foi removido por isso.
 - **Vaga publicada em duas fontes entra duas vezes**, porque `source` faz parte da chave.
   É proposital: permite comparar fontes. Deduplicar entre fontes é assunto do Sprint 8.
+- **Playwright só quando não há alternativa.** Ele abre um navegador de verdade: cada
+  página custa segundos em vez de milissegundos, e o workflow precisa instalar ~190 MB
+  de navegador antes de rodar. Só vale quando o HTML chega vazio e não existe API nem
+  `ld+json` — caso da NTT Data (Salesforce Aura).
+- **Navegar por clique quando a URL não muda.** Na NTT Data a paginação não altera o
+  endereço, então o scraper clica no botão seguinte. O seletor
+  `a.paginate_button.current + a.paginate_button` pega o irmão logo depois do botão
+  atual, e o loop termina quando ele deixa de existir — sem depender de saber o total.
+- **Quando a classe não distingue campos, usar o rótulo.** Na NTT Data a mesma classe
+  serve para "Especialização" e "Modalidade de trabalho"; o scraper separa pelo texto
+  antes dos dois-pontos.
 - Scripts rodam **a partir da raiz do projeto** (`python connectors/lever.py`).
 
 ## Alvos de scraping — diagnóstico já feito
@@ -97,7 +108,7 @@ Antes de qualquer coisa, conferir o `robots.txt`.
 | KPMG | Workday | investigar — um conector Workday serve dezenas de empresas |
 | Microsoft | Eightfold (aplicação JavaScript) | testado: nenhum endereço serve HTML com vagas. DevTools ou Playwright |
 | Revolut | parcial: 6 destaques no HTML, resto por JavaScript | testar API escondida antes de Playwright |
-| NTT Data | Salesforce Aura, 100% JavaScript | Sprint 7 (Playwright) |
+| NTT Data | Salesforce Aura, 100% JavaScript; 3 vagas por página, URL não muda | ✅ `scrapers/nttdata.py` — 54 vagas, com tecnologias |
 | Critical Software, Caixa Mágica, Capgemini, ICT Strypes | não identificado | testar DevTools |
 | The Data Scientists | estático e permitido, mas **sem vagas abertas** | quando publicarem |
 
