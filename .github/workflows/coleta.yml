@@ -22,6 +22,11 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements.txt
 
+      - name: Instalar o navegador do Playwright
+        # o scraper da NTT Data precisa de um navegador de verdade;
+        # --with-deps instala tambem as bibliotecas de sistema que ele exige no Linux
+        run: playwright install --with-deps chromium
+
       - name: Rodar a coleta
         run: python main.py
         env:

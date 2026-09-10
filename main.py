@@ -5,6 +5,7 @@ from connectors.primeit import coletar_primeit
 from scrapers.ltplabs import coletar_ltplabs
 from scrapers.deloitte import coletar_deloitte
 from scrapers.itjobs import coletar_itjobs
+from scrapers.nttdata import coletar_nttdata
 from database.db import criar_tabela, salvar_vagas
 
 # cada fonte e independente: se uma falhar, as outras continuam
@@ -16,6 +17,7 @@ FONTES = [
     ("ltplabs", coletar_ltplabs),
     ("deloitte", coletar_deloitte),
     ("itjobs", coletar_itjobs),
+    ("nttdata", coletar_nttdata),
 ]
 
 
