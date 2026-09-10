@@ -69,8 +69,13 @@ Cobertura local importa mais que volume, porque o objetivo é emprego lá.
   (padrão schema.org). Vale conferir antes de raspar tags. Na LTPlabs existe, mas raspamos
   as tags de propósito, para exercitar a técnica.
 - **Respeitar o `robots.txt`**, incluindo `Crawl-delay` (o ITJobs pede 1 segundo) e as
-  reservas de uso. Quando o site autoriza a listagem mas bloqueia a busca paginada
-  (Landing.jobs), coletamos só o que é permitido.
+  reservas de uso declaradas.
+- **Fonte que devolve zero é tratada como suspeita**, não como resultado. O `main.py`
+  avisa no log. Scraper não quebra quando o site muda: devolve vazio em silêncio, e sem
+  esse aviso a falha passaria semanas despercebida.
+- **Um scraper precisa funcionar no ambiente da automação, não só localmente.**
+  O Landing.jobs trazia 50 vagas na máquina local e zero no GitHub Actions — o site
+  responde diferente conforme a origem do pedido. Foi removido por isso.
 - **Vaga publicada em duas fontes entra duas vezes**, porque `source` faz parte da chave.
   É proposital: permite comparar fontes. Deduplicar entre fontes é assunto do Sprint 8.
 - Scripts rodam **a partir da raiz do projeto** (`python connectors/lever.py`).
@@ -86,7 +91,7 @@ Antes de qualquer coisa, conferir o `robots.txt`.
 |------|-------------|----------|
 | LTPlabs | estático, 15 vagas, todas de dados/IA | ✅ `scrapers/ltplabs.py` |
 | Deloitte (`jobs.deloitte.pt/search/`) | estático, SuccessFactors, paginação `?startrow=` | ✅ `scrapers/deloitte.py` — 76 vagas |
-| Landing.jobs | estático; 54 vagas, mas a 2ª página é montada por JavaScript | ✅ `scrapers/landingjobs.py` — 50 vagas, com skills |
+| Landing.jobs | estático localmente, mas devolve página sem vagas para o IP do GitHub Actions | ❌ removido — funcionava só na máquina local |
 | ITJobs | estático, portal; `Crawl-delay: 1` | ✅ `scrapers/itjobs.py` — 320 vagas, 61 empresas |
 | PrimeIT | site é vitrine do key.work; API própria com `tenant-descriptor` | ✅ `connectors/primeit.py` |
 | KPMG | Workday | investigar — um conector Workday serve dezenas de empresas |
@@ -101,7 +106,6 @@ Notas de robots.txt:
   de copyright. Coletar e analisar é permitido; treinar modelo com o conteúdo, não.
   Também bloqueia `ClaudeBot`, então o Claude não deve fazer requisições ao site —
   o scraper dela, sim.
-- **Landing.jobs**: bloqueia `/api/` e `/jobs/search`; as páginas de vaga são permitidas.
 - **Deloitte**: bloqueia só áreas de candidatura; `/search/` é permitido.
 - **The Data Scientists**: `Crawl-delay: 10`.
 

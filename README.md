@@ -6,9 +6,9 @@ competências, tecnologias e tendências do mercado.
 
 ## O que já funciona
 
-- **Oito fontes de dados** — quatro APIs (Lever, Greenhouse, SmartRecruiters, PrimeIT) e
-  quatro scrapers (ITJobs, Deloitte, Landing.jobs, LTPlabs), todas traduzidas para um
-  schema único apesar de formatos completamente diferentes
+- **Sete fontes de dados** — quatro APIs (Lever, Greenhouse, SmartRecruiters, PrimeIT) e
+  três scrapers (ITJobs, Deloitte, LTPlabs), todas traduzidas para um schema único
+  apesar de formatos completamente diferentes
 - **Banco na nuvem** — SQLite hospedado (Turso), com inserção idempotente
 - **Histórico de vagas** — os campos `first_seen` e `last_seen` permitem saber quando uma
   vaga apareceu, se ainda está aberta e quanto tempo durou
@@ -21,7 +21,7 @@ Cerca de **22 mil vagas** acompanhadas, das quais **1,6 mil em Portugal**.
 ```
 APIs         Lever · Greenhouse · SmartRecruiters · PrimeIT   ──┐
                                                                 ├──> schema único ──> Turso
-Scrapers     ITJobs · Deloitte · Landing.jobs · LTPlabs       ──┘         ^
+Scrapers     ITJobs · Deloitte · LTPlabs                      ──┘         ^
                                                        GitHub Actions ────┘
                                                         (diário, 06:00 UTC)
 ```
@@ -40,7 +40,8 @@ Algumas das principais:
 - **Escrita em lote** no banco remoto — reduziu a coleta de 27 para 3 minutos
 - **Filtro antes da requisição cara** — quando uma API exige uma chamada por vaga, as vagas
   são filtradas por país antes dessa etapa: 88% menos requisições
-- **Falha isolada por fonte** — um scraper quebrado não derruba a coleta das outras sete
+- **Falha isolada por fonte** — um scraper quebrado não derruba a coleta das outras, e
+  fonte que devolve zero vagas é sinalizada no log em vez de passar despercebida
 - **`robots.txt` respeitado**, incluindo `Crawl-delay` e restrições de uso declaradas
 
 ## Sobre o scraping
@@ -60,7 +61,7 @@ ferramenta usada (`scrapers/explorar.py`) e as restrições de `robots.txt` de c
 | Aquisição | Conectores de API (4 plataformas) | ✅ |
 | Armazenamento | Banco SQLite → Turso | ✅ |
 | Automação | GitHub Actions diário | ✅ |
-| Aquisição | Web scraping com BeautifulSoup (4 sites) | ✅ |
+| Aquisição | Web scraping com BeautifulSoup (3 sites) | ✅ |
 | Aquisição | Playwright para sites com JavaScript | em andamento |
 | Tratamento | Limpeza e normalização | |
 | Visualização | Dashboard Streamlit | |
