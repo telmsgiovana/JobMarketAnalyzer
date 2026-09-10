@@ -2,10 +2,13 @@ from connectors.lever import coletar_lever
 from connectors.greenhouse import coletar_greenhouse
 from connectors.smartrecruiter import coletar_smartrecruiters
 from connectors.primeit import coletar_primeit
+from connectors.breezy import coletar_breezy
+from connectors.microsoft import coletar_microsoft
 from scrapers.ltplabs import coletar_ltplabs
 from scrapers.deloitte import coletar_deloitte
 from scrapers.itjobs import coletar_itjobs
 from scrapers.nttdata import coletar_nttdata
+from scrapers.caixamagica import coletar_caixamagica
 from database.db import criar_tabela, salvar_vagas
 
 # cada fonte e independente: se uma falhar, as outras continuam
@@ -14,10 +17,13 @@ FONTES = [
     ("greenhouse", coletar_greenhouse),
     ("smartrecruiters", coletar_smartrecruiters),
     ("primeit", coletar_primeit),
+    ("breezy", coletar_breezy),
+    ("microsoft", coletar_microsoft),
     ("ltplabs", coletar_ltplabs),
     ("deloitte", coletar_deloitte),
     ("itjobs", coletar_itjobs),
     ("nttdata", coletar_nttdata),
+    ("caixamagica", coletar_caixamagica),
 ]
 
 
