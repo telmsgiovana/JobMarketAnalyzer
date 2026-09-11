@@ -23,6 +23,7 @@ EMPRESA = "nttdata"
 PAIS = "PT"          # a URL ja filtra Portugal
 
 MAX_PAGINAS = 30     # limite de seguranca: hoje sao 18
+ESPERA = 60000       # ms; o ambiente do GitHub Actions e mais lento que o local
 
 # a mesma classe serve para campos diferentes, entao a distincao e pelo rotulo
 ROTULOS = {
@@ -121,8 +122,10 @@ def coletar_nttdata():
         navegador = p.chromium.launch()
         pagina = navegador.new_page()
 
-        pagina.goto(URL)
-        pagina.wait_for_load_state("networkidle")
+        # esperar a rede sossegar ("networkidle") e fragil: sites com telemetria
+        # de fundo nunca ficam parados. Melhor esperar o que interessa aparecer.
+        pagina.goto(URL, timeout=ESPERA, wait_until="domcontentloaded")
+        pagina.wait_for_selector("div.views-row", timeout=ESPERA)
 
         vagas = coletar_paginas(pagina)
         navegador.close()

@@ -21,6 +21,7 @@ EMPRESA = "caixamagica"
 PAIS = "PT"
 
 ROLAGENS = 3        # a lista so aparece depois de rolar
+ESPERA = 60000      # ms; o ambiente do GitHub Actions e mais lento que o local
 
 
 def texto_de(card, classe):
@@ -66,12 +67,15 @@ def buscar_html():
         navegador = p.chromium.launch()
         pagina = navegador.new_page()
 
-        pagina.goto(URL, timeout=60000, wait_until="domcontentloaded")
-        pagina.wait_for_timeout(4000)
+        pagina.goto(URL, timeout=ESPERA, wait_until="domcontentloaded")
 
+        # a lista so e montada depois de rolar, entao rola primeiro
         for _ in range(ROLAGENS):
             pagina.mouse.wheel(0, 5000)
             pagina.wait_for_timeout(2500)
+
+        # e so entao espera as vagas existirem de fato
+        pagina.wait_for_selector("div.rbox-opening-li", timeout=ESPERA)
 
         html = pagina.content()
         navegador.close()
